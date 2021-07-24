@@ -28,6 +28,9 @@
   socket.on('NEW_CONN_EVENT', function (data) { 
     addMessage(data.msg);
   })
+  socket.on('disconnect_MSG', function (data) { 
+    addMessage(data.msg);
+  })
   document.getElementById('send').onclick = function() { 
     socket.emit('CLIENT_MSG', { msg: document.getElementById('input').value }); 
     document.getElementById('input').value = '';
