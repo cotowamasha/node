@@ -30,18 +30,41 @@ const app = http.createServer((request, response) => {
 
 const socket = io(app);
 
+const createName = () => {
+  var name = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 5; i++)
+  name += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return name;
+}
+
 socket.on('connection', function (socket) {
   console.log('New connection');
+  const userName = createName()
 
   socket.broadcast.emit('NEW_CONN_EVENT', {
-    msg: 'The new client connected'
+    msg: `The new client connected: ${userName}`
   });
 
   socket.on('CLIENT_MSG', (data) => {
     socket.emit('SERVER_MSG', {
-      msg: data.msg
+      msg: `${userName}: ${data.msg}`
     });
   });
+  socket.on('CLIENT_MSG', (data) => {
+    socket.broadcast.emit('SERVER_MSG', {
+      msg: `${userName}: ${data.msg}`
+    });
+  });
+
+  socket.on('disconnect', () => {
+    console.log('disconnect');
+    socket.broadcast.emit('disconnect_MSG', {
+      msg: `disconnect: ${userName}`
+    });
+  })
 });
 
 
